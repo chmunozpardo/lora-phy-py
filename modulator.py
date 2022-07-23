@@ -6,7 +6,7 @@ class Modulator:
     crc_calculator = CrcCalculator(Crc16.CCITT)
 
     def __init__(
-        self, samples: float, Fs: int, fa: float, fb: float, SF: int
+        self, samples: int, Fs: int, fa: float, fb: float, SF: int
     ) -> None:
         self.fa = fa
         self.fb = fb

@@ -35,26 +35,26 @@ class Demodulator:
     crc_calculator = CrcCalculator(Crc16.CCITT)
 
     def __init__(
-        self, dt: float, Fs: int, fa: float, fb: float, SF: int
+        self, samples: int, Fs: int, fa: float, fb: float, SF: int
     ) -> None:
-        self.dt = dt
         self.fa = fa
         self.fb = fb
         self.SF = SF
         self.Fs = Fs
         self.df = fb - fa
-        self.samples = int(np.ceil(Fs * dt))
+        self.samples = samples
         self.symbolStep = (fb - fa) / 2.0**SF
-        self.freqRate = (fb - fa) / dt
         self.totalSamples = 0
         self.window = np.hanning(self.samples)
         self.binSize = int(self.samples / 2 ** (SF + 1))
-        t0 = np.linspace(0, self.dt, self.samples, endpoint=False)
+        t0 = np.arange(0, self.samples) / self.Fs
+
+        freqRate = (self.fb - self.fa) * (self.Fs / self.samples)
         self.upchirp = np.exp(
-            1j * 2 * np.pi * (t0 * (self.fa + 0.5 * self.freqRate * t0))
+            1j * 2 * np.pi * (t0 * (self.fa + 0.5 * freqRate * t0))
         )
         self.downchirp = np.exp(
-            -1j * 2 * np.pi * (t0 * (self.fa + 0.5 * self.freqRate * t0))
+            -1j * 2 * np.pi * (t0 * (self.fa + 0.5 * freqRate * t0))
         )
 
         self.currentState = StateMachine.IDLE
