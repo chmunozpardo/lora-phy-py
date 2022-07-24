@@ -98,7 +98,7 @@ class Demodulator:
                 + fftAbs[midSample + startInd : (midSample + endInd)]
             )
         peak = np.argmax(fftTemp)
-        if fftTemp[peak] < 0.1:
+        if fftTemp[peak] < 0.01:
             return None
         return peak // self.binSize
 
@@ -116,6 +116,8 @@ class Demodulator:
                 self.currentState = StateMachine.PREAMB2
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.PREAMB2:
@@ -124,6 +126,8 @@ class Demodulator:
                 self.currentState = StateMachine.PREAMB3
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.PREAMB3:
@@ -132,6 +136,8 @@ class Demodulator:
                 self.currentState = StateMachine.PREAMB4
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.PREAMB4:
@@ -140,6 +146,8 @@ class Demodulator:
                 self.currentState = StateMachine.PREAMB5
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.PREAMB5:
@@ -148,6 +156,8 @@ class Demodulator:
                 self.currentState = StateMachine.PREAMB6
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.PREAMB6:
@@ -156,6 +166,8 @@ class Demodulator:
                 self.currentState = StateMachine.PREAMB7
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.PREAMB7:
@@ -164,6 +176,8 @@ class Demodulator:
                 self.currentState = StateMachine.PREAMB8
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.PREAMB8:
@@ -172,6 +186,8 @@ class Demodulator:
                 self.currentState = StateMachine.LENG1
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.LENG1:
@@ -187,10 +203,13 @@ class Demodulator:
                 self.currentState = StateMachine.LENG2
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.LENG2:
             if symbol is not None:
+                self.resultSymbols = []
                 self.resultSymbols.append(
                     (symbol - self.lastSymbol) % 2**self.SF
                 )
@@ -198,6 +217,8 @@ class Demodulator:
                 self.dataCounter += 1
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.DATA:
@@ -219,6 +240,8 @@ class Demodulator:
                     self.currentState = StateMachine.CHECKSUM1
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.CHECKSUM1:
@@ -227,6 +250,8 @@ class Demodulator:
                 self.currentState = StateMachine.CHECKSUM2
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.CHECKSUM2:
@@ -238,6 +263,8 @@ class Demodulator:
                 self.currentState = StateMachine.CHECKSUM3
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.CHECKSUM3:
@@ -248,6 +275,8 @@ class Demodulator:
                 self.currentState = StateMachine.CHECKSUM4
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.CHECKSUM4:
@@ -272,6 +301,8 @@ class Demodulator:
                 self.currentState = StateMachine.SKIP_NEXT
                 return
             self.lastSymbol = None
+            self.dataCounter = 0
+            self.resultLength = 0
             self.currentState = StateMachine.IDLE
             return
         elif self.currentState == StateMachine.SKIP_NEXT:
