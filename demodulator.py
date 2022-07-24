@@ -88,8 +88,8 @@ class Demodulator:
         midSample = self.samples // 2
         result = signal * self.downchirp * self.window
         fftTemp = np.zeros(midSample)
-        fftResult = np.fft.fft(result)
-        fftAbs = np.abs(fftResult) / self.samples
+        fftResult = np.fft.fft(result) / self.samples
+        fftAbs = np.abs(fftResult)
         for binIndex in range(2**self.SF):
             startInd = binIndex * self.binSize
             endInd = startInd + self.binSize
@@ -98,7 +98,9 @@ class Demodulator:
                 + fftAbs[midSample + startInd : (midSample + endInd)]
             )
         peak = np.argmax(fftTemp)
-        if fftTemp[peak] < 0.01:
+        avgF = np.mean(fftTemp)
+        stdF = np.std(fftTemp)
+        if fftTemp[peak] < (avgF + 2.0 * stdF):
             return None
         return peak // self.binSize
 

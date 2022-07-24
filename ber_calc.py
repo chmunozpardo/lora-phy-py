@@ -1,11 +1,8 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import random
 from modulator import Modulator
 from demodulator import Demodulator
-from scipy.signal import stft
 
-import random
 
 testN = 1000
 berResult = 0.0
