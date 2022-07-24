@@ -5,12 +5,12 @@ import pyaudio
 # Main process
 def main():
     # LoRa Parameters
-    Fs = 48000
-    BW = Fs // 2
-    fa = 0
-    fb = BW
-    SF = 4
-    samples = 8192 * 2
+    Fs = 48000  # Sample rate [samples/s]
+    BW = Fs // 2  # Bandwidth [Hz]
+    fa = 0  # Start frequency [Hz]
+    fb = BW  # Stop frequency [Hz]
+    SF = 4  # Spread factor == Bits per symbol
+    samples = 16384  # Number of samples
 
     # Demodulator
     demod = Demodulator(samples, Fs, fa, fb, SF)
