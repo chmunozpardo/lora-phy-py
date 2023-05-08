@@ -1,0 +1,12 @@
+[tool.black]
+line-length = 120
+
+[tool.pylint]
+extension-pkg-whitelist = "pydantic"
+class-attribute-naming-style = "snake_case"
+max-line-length = 120
+disable = ["R0904", "R0902", "R0903", "R0913", "R0914"]
+
+[tool.flake8]
+extend-ignore = "E203" # For ":" in slices
+max-line-length = 120
