@@ -85,19 +85,27 @@ class Demodulator:
 
         self.result_length = 0
         self.result_symbols = []
-        self.checksum = []
+        self.checksum = 0
         self.package = PackageInfo()
         self.preamb_size = 8
 
         if self.spread_factor == 2:
+            self.data_bits = 2
             self.step = 4
             self.leng_size = 4
             self.checksum_size = 8
         elif self.spread_factor == 4:
+            self.data_bits = 4
+            self.step = 2
+            self.leng_size = 2
+            self.checksum_size = 4
+        elif self.spread_factor == 7:
+            self.data_bits = 4
             self.step = 2
             self.leng_size = 2
             self.checksum_size = 4
         elif self.spread_factor == 8:
+            self.data_bits = 8
             self.step = 1
             self.leng_size = 1
             self.checksum_size = 2
@@ -157,8 +165,8 @@ class Demodulator:
         if self.spread_factor == 8:
             value = symbols[0]
         elif self.spread_factor == 7:
-            value = self.decode_int(symbols[0])
-            value += self.decode_int(symbols[1] << 4)
+            value = symbols[0]
+            value += symbols[1] << 4
         elif self.spread_factor == 4:
             value = symbols[0]
             value += symbols[1] << 4
@@ -239,8 +247,10 @@ class Demodulator:
             self.reset_machine(symbol)
             return
         if self.current_state == StateMachine.LENG:
-            current_step = self.length_counter * self.spread_factor
-            self.result_length += ((symbol - self.reference_symbol) % 2**self.spread_factor) << current_step
+            rel_value = (symbol - self.reference_symbol) % 2**self.spread_factor
+            current_step = self.length_counter * self.data_bits
+            dec_int = self.decode_int(rel_value)
+            self.result_length += dec_int << current_step
             self.length_counter += 1
             if self.length_counter == self.leng_size:
                 if self.result_length == 0:
@@ -253,7 +263,9 @@ class Demodulator:
                 return
             return
         if self.current_state == StateMachine.DATA:
-            self.result_symbols.append((symbol - self.reference_symbol) % 2**self.spread_factor)
+            rel_value = (symbol - self.reference_symbol) % 2**self.spread_factor
+            dec_int = self.decode_int(rel_value)
+            self.result_symbols.append(dec_int)
             self.data_counter += 1
             if self.data_counter == self.result_length:
                 value = self.symbols2string(self.result_symbols)
@@ -267,8 +279,10 @@ class Demodulator:
                 self.current_state = StateMachine.CHECKSUM
             return
         if self.current_state == StateMachine.CHECKSUM:
-            current_step = self.checksum_counter * self.spread_factor
-            self.checksum += ((symbol - self.reference_symbol) % 2**self.spread_factor) << current_step
+            rel_value = (symbol - self.reference_symbol) % 2**self.spread_factor
+            current_step = self.checksum_counter * self.data_bits
+            dec_int = self.decode_int(rel_value)
+            self.checksum += dec_int << current_step
             self.checksum_counter += 1
             if self.checksum_counter == self.checksum_size:
                 if self.checksum == self.package.checksum:

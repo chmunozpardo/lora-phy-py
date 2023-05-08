@@ -21,7 +21,7 @@ class SingleTest:
         init_freq = 0
         end_freq = sample_frequency // 2
         self.spread_factor = spread_factor
-        self.samples = 2 ** (spread_factor + 1)
+        self.samples = 512
 
         # Modulator and demodulator
         self.mod = Modulator(self.samples, sample_frequency, init_freq, end_freq, spread_factor, redundancy)
