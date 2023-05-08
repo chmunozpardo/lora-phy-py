@@ -51,7 +51,7 @@ def main():
     stream = py_audio.open(
         format=pyaudio.paFloat32,
         channels=1,
-        rate=sample_rate,
+        rate=sample_rate * redundancy,
         output=True,
     )
 

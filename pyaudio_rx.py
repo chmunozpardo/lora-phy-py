@@ -13,7 +13,7 @@ def main():
     initial_freq = 0  # Start frequency [Hz]
     end_freq = bandwidth  # Stop frequency [Hz]
     spreading_factor = 4  # Spread factor == Bits per symbol
-    samples = 16384  # Number of samples
+    samples = 2048  # Number of samples
     redundancy = 4  # Redundancy
 
     # Demodulator
@@ -36,7 +36,7 @@ def main():
         channels=1,
         rate=sample_rate,
         input=True,
-        frames_per_buffer=samples,
+        frames_per_buffer=samples * redundancy,
         stream_callback=callback,
     )
 
