@@ -1,4 +1,5 @@
 crc==4.2.0
-matplotlib==3.5.1
-numpy==1.21.5
+Flake8-pyproject
+matplotlib
+numpy
 PyAudio==0.2.13 # sudo apt install portaudio19-dev

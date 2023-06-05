@@ -13,8 +13,8 @@ def main():
     initial_freq = 0  # Start frequency [Hz]
     end_freq = bandwidth  # Stop frequency [Hz]
     spreading_factor = 4  # Spread factor == Bits per symbol
-    samples = 2048  # Number of samples
-    redundancy = 4  # Redundancy
+    samples = 4096 * 2  # Number of samples
+    redundancy = 1  # Redundancy
 
     # Demodulator
     demod = Demodulator(samples, sample_rate, initial_freq, end_freq, spreading_factor, redundancy)

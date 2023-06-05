@@ -166,7 +166,7 @@ if __name__ == "__main__":
     # test.run_tx()
 
     # The following lines plot the BER parameter for different parameters
-    noise_options = list(np.linspace(1, 20.0, 20))
+    noise_options = list(np.linspace(0.5, 10.0, 3))
     test2 = SingleTest(number_tests=N, spread_factor=7, redundancy=2)
     (noise_snr2, noise_result2) = test2.run_ber(noise_options)
     plt.plot(noise_snr2, noise_result2 * 100, label="Redundancy=2")

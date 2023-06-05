@@ -14,8 +14,8 @@ def main():
     initial_freq = 0  # Start frequency [Hz]
     end_freq = bandwidth  # Stop frequency [Hz]
     spreading_factor = 4  # Spread factor == Bits per symbol
-    samples = 16384  # Number of samples
-    redundancy = 4  # Redundancy
+    samples = 4096 * 2  # Number of samples
+    redundancy = 1  # Redundancy
 
     # Modulator
     mod = Modulator(samples, sample_rate, initial_freq, end_freq, spreading_factor, redundancy)
@@ -34,7 +34,7 @@ def main():
     y_preamble: NDArray[np.float64] = np.concatenate((null_start, y_preamble))
 
     # Generate white noise
-    noise_value = 1.0
+    noise_value = 0.001
     noise_preamble = np.random.normal(0, noise_value, size=len(y_preamble))
 
     # Calculate signal, noise power and SNR

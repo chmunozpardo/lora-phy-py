@@ -12,10 +12,15 @@ class PackageState(Enum):
     """Package State Enum"""
 
     NO_PACKAGE = 0
+    """No package has been received"""
     CRC_ERROR = 1
+    """Checksum mismatch"""
     UNCOMPLETED_LENGTH = 2
+    """Unused"""
     PACKAGE_DETECTED = 3
+    """Package has been received and CHECKSUM might mismatch"""
     PACKAGE_READY = 4
+    """Package has been successfully received"""
 
 
 class StateMachine(Enum):
@@ -87,7 +92,9 @@ class Demodulator:
         self.result_symbols = []
         self.checksum = 0
         self.package = PackageInfo()
+        """Package information after processing"""
         self.preamb_size = 8
+        """Number of symbols for PREAMBLE"""
 
         if self.spread_factor == 2:
             self.data_bits = 2
@@ -125,14 +132,19 @@ class Demodulator:
         """
         output = 0
         if self.spread_factor == 7:
+            # Process only first 7 bits
             bin_value = np.array(np.unpackbits(np.uint8(value))[1:8])
+            # Check if there is a bit error
             bin_res = self.h_mat @ bin_value % 2
             for i, val in enumerate(bin_res):
                 output += val << 2 - i
+            # If there is a flipped bit, output != 0
             if output > 0:
-                bin_value[output - 1] ^= 0b1
+                bin_value[output - 1] ^= 0b1  # XOR with 1 to flip the bit
+            # Remove redundancy bits
             bin_res = self.p_mat @ bin_value
             output = 0
+            # Append bits to output
             for i, val in enumerate(bin_res):
                 output += val << 3 - i
             return output
@@ -192,7 +204,7 @@ class Demodulator:
             int | None: Returns the symbol number if it can be detected. Otherwise returns None
         """
         if not len(signal) == self.samples * self.redundancy:
-            raise ValueError
+            raise ValueError("Buffer must be equal to the total number of samples")
         mid_sample = self.samples // 2
         result = signal * self.downchirp * self.window
         fft_temp = np.zeros(mid_sample)
@@ -236,17 +248,18 @@ class Demodulator:
             self.current_state = StateMachine.PREAMB
             return
         if self.current_state == StateMachine.PREAMB:
-            if self.last_symbol == symbol:
-                self.preamb_counter += 1
-                if self.preamb_counter == self.preamb_size:
-                    self.reference_symbol = symbol
-                    self.result_length = 0
-                    self.length_counter = 0
-                    self.current_state = StateMachine.LENG
+            if self.last_symbol == symbol:  # Check if symbol is the same as before
+                self.preamb_counter += 1  # Increase counter if symbol is equal
+                if self.preamb_counter == self.preamb_size:  # If preamble size reached, go to read length
+                    self.reference_symbol = symbol  # Save symbol as reference (= symbol 0)
+                    self.result_length = 0  # Initialize Length variable
+                    self.length_counter = 0  # Initialize Length counter
+                    self.current_state = StateMachine.LENG  # Machine is prepared to count receive the package length
                 return
             self.reset_machine(symbol)
             return
         if self.current_state == StateMachine.LENG:
+            # Calculated symbol with respect to reference_symbol
             rel_value = (symbol - self.reference_symbol) % 2**self.spread_factor
             current_step = self.length_counter * self.data_bits
             dec_int = self.decode_int(rel_value)
